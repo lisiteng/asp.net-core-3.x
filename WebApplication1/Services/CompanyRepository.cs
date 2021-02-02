@@ -129,25 +129,32 @@ namespace WebApplication1.Services
             return await _context.employees.Where(x => x.companyId == companyId && x.id == employeeId).FirstOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<Employee>> GetEmployeesAsync(Guid companyId, string genderDisplay, string q)
+        public async Task<IEnumerable<Employee>> GetEmployeesAsync(Guid companyId, EmployeeDtoParameter employeeDtoParameter)
         {
             if (companyId == Guid.Empty)
             {
                 throw new ArgumentNullException(nameof(companyId));
             }
             var items = _context.employees.Where(x => x.companyId == companyId);
-            if (!string.IsNullOrWhiteSpace(genderDisplay))
+            if (!string.IsNullOrWhiteSpace(employeeDtoParameter.gender))
             {
-                genderDisplay = genderDisplay.Trim();
-                var gender = Enum.Parse<Gender>(genderDisplay);
+                employeeDtoParameter.gender = employeeDtoParameter.gender.Trim();
+                var gender = Enum.Parse<Gender>(employeeDtoParameter.gender);
                 items = items.Where(x => x.gender == gender);
             }
-            if (!string.IsNullOrWhiteSpace(q))
+            if (!string.IsNullOrWhiteSpace(employeeDtoParameter.q))
             {
-                q = q.Trim();
-                items = items.Where(x => x.employeeNo.Contains(q) || x.firstName.Contains(q) || x.lastName.Contains(q));
+                employeeDtoParameter.q = employeeDtoParameter.q.Trim();
+                items = items.Where(x => x.employeeNo.Contains(employeeDtoParameter.q) || x.firstName.Contains(employeeDtoParameter.q) || x.lastName.Contains(employeeDtoParameter.q));
             }
-            return await items.OrderBy(x => x.employeeNo).ToListAsync();
+            if (!string.IsNullOrWhiteSpace(employeeDtoParameter.orderBy))
+            {
+                if (employeeDtoParameter.orderBy.ToLowerInvariant() == "name")
+                {
+                    items = items.OrderBy(x => x.firstName).ThenBy(x => x.lastName);
+                }
+            }
+            return await items.ToListAsync();
         }
 
         public async Task<bool> SaveAysnc()

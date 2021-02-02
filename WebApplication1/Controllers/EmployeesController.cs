@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WebApplication1.DtoParameters;
 using WebApplication1.Entities;
 using WebApplication1.Models;
 using WebApplication1.Services;
@@ -25,13 +26,13 @@ namespace WebApplication1.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<EmployeeDto>>> GetEmployeesForCompany(Guid companyId, [FromQuery] string genderDisplay, string q)
+        public async Task<ActionResult<IEnumerable<EmployeeDto>>> GetEmployeesForCompany(Guid companyId, EmployeeDtoParameter employeeDtoParameter)
         {
             if (!await _companyRepository.CompanyExistsAsync(companyId))
             {
                 return NotFound();
             }
-            var employees = await _companyRepository.GetEmployeesAsync(companyId, genderDisplay, q);
+            var employees = await _companyRepository.GetEmployeesAsync(companyId, employeeDtoParameter);
             return Ok(_mapper.Map<IEnumerable<EmployeeDto>>(employees));
         }
 

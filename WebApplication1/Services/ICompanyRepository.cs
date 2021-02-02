@@ -18,7 +18,7 @@ namespace WebApplication1.Services
         void DeleteCompany(Company company);
         Task<bool> CompanyExistsAsync(Guid companyId);
 
-        Task<IEnumerable<Employee>> GetEmployeesAsync(Guid companyId, string genderDisplay,string q);
+        Task<IEnumerable<Employee>> GetEmployeesAsync(Guid companyId, EmployeeDtoParameter employeeDtoParameter);
         Task<Employee> GetEmployeeAsync(Guid companyId, Guid employeeId);
         void AddEmployee(Guid companyId, Employee employee);
         void UpdateEmployee(Employee employee);
