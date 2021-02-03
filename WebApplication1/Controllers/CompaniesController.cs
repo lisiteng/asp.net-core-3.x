@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,18 +16,21 @@ namespace WebApplication1.Controllers
     [Route("api/companies")]
     public class CompaniesController : ControllerBase
     {
+        private readonly ILogger<CompaniesController> _logger;
         private readonly ICompanyRepository _companyRepository;
         private readonly IMapper _mapper;
-        public CompaniesController(ICompanyRepository companyRepository, IMapper mapper)
+        public CompaniesController(ICompanyRepository companyRepository, IMapper mapper, ILogger<CompaniesController> logger)
         {
             _companyRepository = companyRepository ?? throw new ArgumentNullException(nameof(companyRepository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         [HttpGet]
         [HttpHead]
         public async Task<ActionResult<IEnumerable<CompanyDto>>> GetCompanies(CompanyDtoParameter companyDtoParameter)
         {
+            _logger.LogInformation("哈哈");
             var companies = await _companyRepository.GetCompaniesAsync(companyDtoParameter);
             var companydtos = _mapper.Map<IEnumerable<CompanyDto>>(companies);
             return Ok(companydtos);
@@ -60,7 +64,7 @@ namespace WebApplication1.Controllers
             {
                 return NotFound();
             }
-            await _companyRepository.GetEmployeesAsync(companyId, null, null);
+            await _companyRepository.GetEmployeesAsync(companyId, null);
             _companyRepository.DeleteCompany(company);
             await _companyRepository.SaveAysnc();
             return NoContent();
